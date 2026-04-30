@@ -17,6 +17,8 @@ The integration exposes the following entities:
 - **Virtual Gas Meter Consumed Gas** — estimated gas consumed since the last real meter reading
 - **Virtual Gas Meter Heating Interval** — boiler runtime since the last real meter reading
 
+![Virtual Gas Meter Example](docs/assets/virtual-gas-meter-example.png)
+
 ## Installation
 
 ### HACS Custom Repository (Recommended)
