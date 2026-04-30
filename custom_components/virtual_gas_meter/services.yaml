@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=../../schemas/yaml/services_schema.yaml
+
+real_meter_reading_update:
+  name: Real Meter Reading Update
+  description: >
+    Update the virtual gas meter with a real meter reading to improve accuracy
+    and recalculate the average consumption rate.
+  fields:
+    meter_reading:
+      name: Meter Reading
+      description: The new real meter reading from your physical gas meter in your configured unit.
+      required: true
+      example: 4447.816
+      selector:
+        number:
+          min: 0
+          max: 999999
+          step: 0.001
+          mode: box
+    timestamp:
+      name: Timestamp
+      description: Optional timestamp for the reading. If omitted, the current time is used.
+      required: false
+      example: "2026-04-30 15:51:00"
+      selector:
+        datetime:
+    recalculate_average_rate:
+      name: Recalculate Average Rate
+      description: >
+        If true, recalculates the average hourly consumption rate based on actual
+        usage. If false, only snaps the meter total without updating the rate.
+      required: false
+      default: true
+      example: true
+      selector:
+        boolean:

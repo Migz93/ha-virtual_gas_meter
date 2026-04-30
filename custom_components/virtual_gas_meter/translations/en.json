@@ -1,0 +1,99 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Virtual Gas Meter",
+        "description": "Configure your virtual gas meter. {unit_note}",
+        "data": {
+          "boiler_entity_id": "Boiler Entity",
+          "unit": "Unit System",
+          "initial_meter_reading": "Initial Meter Reading",
+          "initial_average_rate": "Initial Average Hourly Consumption"
+        },
+        "data_description": {
+          "boiler_entity_id": "Select the entity that represents your boiler.",
+          "unit": "Choose cubic meters or hundred cubic feet.",
+          "initial_meter_reading": "Enter your current gas meter reading.",
+          "initial_average_rate": "Enter the estimated gas consumption per hour while the boiler is running."
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Virtual Gas Meter",
+        "description": "Update the boiler entity and average consumption rate.",
+        "data": {
+          "boiler_entity_id": "Boiler Entity",
+          "average_rate_per_h": "Average Hourly Consumption"
+        }
+      }
+    },
+    "error": {
+      "entity_not_found": "Entity not found.",
+      "invalid_domain": "Select a switch, climate, binary sensor, or sensor entity.",
+      "must_be_positive": "Value must be greater than zero.",
+      "unknown": "Unknown error occurred."
+    },
+    "abort": {
+      "single_instance_allowed": "Virtual Gas Meter only supports one instance."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Virtual Gas Meter Options",
+        "description": "Update the boiler entity and average consumption rate. Current unit: {current_unit}.\n\n{info}",
+        "data": {
+          "boiler_entity_id": "Boiler Entity",
+          "average_rate_per_h": "Average Hourly Consumption"
+        },
+        "data_description": {
+          "boiler_entity_id": "Select the entity that represents your boiler.",
+          "average_rate_per_h": "Average gas consumption per hour while the boiler is running."
+        }
+      }
+    }
+  },
+  "services": {
+    "real_meter_reading_update": {
+      "name": "Real Meter Reading Update",
+      "description": "Update the virtual gas meter with a real meter reading.",
+      "fields": {
+        "meter_reading": {
+          "name": "Meter Reading",
+          "description": "The new real meter reading from your physical gas meter."
+        },
+        "timestamp": {
+          "name": "Timestamp",
+          "description": "Optional timestamp for the reading."
+        },
+        "recalculate_average_rate": {
+          "name": "Recalculate Average Rate",
+          "description": "If true, recalculates the average hourly consumption rate based on actual usage."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "meter_total": {
+        "name": "Virtual Gas Meter Total",
+        "state_attributes": {
+          "last_real_meter_reading": {
+            "name": "Last Real Meter Reading"
+          },
+          "last_real_meter_timestamp": {
+            "name": "Last Real Meter Timestamp"
+          },
+          "average_rate_per_h": {
+            "name": "Average Rate Per Hour"
+          },
+          "boiler_entity_id": {
+            "name": "Boiler Entity ID"
+          },
+          "unit": {
+            "name": "Unit"
+          }
+        }
+      }
+    }
+  }
+}
