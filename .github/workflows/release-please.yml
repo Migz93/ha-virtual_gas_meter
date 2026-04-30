@@ -17,8 +17,6 @@ permissions:
 jobs:
   release-please:
     name: Release Please
-    # Skip when running inside the template repository itself
-    if: github.repository != 'Migz93/ha-virtual_gas_meter'
     runs-on: ubuntu-latest
     steps:
       - name: Run release-please
