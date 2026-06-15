@@ -21,13 +21,13 @@ For development and testing, keep configuration minimal:
 default_config:
 
 # Enable your integration
-your_domain:
+virtual_gas_meter:
 
 # Logging for development
 logger:
   default: info
   logs:
-    custom_components.your_domain: debug
+    custom_components.virtual_gas_meter: debug
 ```
 
 ## Modern Syntax Only
@@ -82,7 +82,7 @@ logger:
   default: warning
   logs:
     # Your integration - verbose
-    custom_components.your_domain: debug
+    custom_components.virtual_gas_meter: debug
 
     # Reduce noise from other components
     homeassistant.components.http: warning
