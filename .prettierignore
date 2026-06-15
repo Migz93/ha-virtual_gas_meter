@@ -4,5 +4,8 @@ config/
 custom_components/
 !custom_components/virtual_gas_meter/
 
+# Auto-generated release files
+CHANGELOG.md
+
 # Ignore-style files (no recognized extension — Prettier would misparse them)
 *ignore
