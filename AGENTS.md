@@ -657,6 +657,20 @@ These PRs almost always contain mechanical name substitutions that incorrectly r
 - Changes to `.devcontainer/devcontainer.json` that remove our custom `name`, `runArgs`, `workspaceMount`, `workspaceFolder`, or `mounts` entries
 - Changes to `script/setup/bootstrap` that remove the `SYSTEM_UV_BIN` workaround (see note below)
 
+**Exception:** Path-specific template instruction files under `.github/instructions/blueprint.*.instructions.md`
+are template-owned. It is acceptable for those files to use generic placeholders such as `{domain}`,
+`{ClassPrefix}`, `<your_domain>`, or `your_domain` when those placeholders come from upstream template
+guidance. Do not treat placeholder changes in those files as noise by default.
+
+Project-owned instruction files remain integration-specific and should not be overwritten by generic
+template placeholders:
+
+- `AGENTS.md`
+- `CLAUDE.md`
+- `GEMINI.md`
+- `.github/copilot-instructions.md`
+- `.github/prompts/*.prompt.md`
+
 ### The uv workaround in `script/setup/bootstrap`
 
 We added a `SYSTEM_UV_BIN` workaround (commit `3c5f86b`) to fix a real CI issue: when the venv is wiped during an HA version change, the venv's `bin/` is still prepended to `PATH` from the earlier activation. If `uv` resolved through the now-deleted venv path, the `uv venv` recreate call would fail. Capturing the system uv path before any venv activation ensures the correct binary is always used.
@@ -665,7 +679,7 @@ The upstream template does not have this fix and reverts it on every sync. **Do 
 
 ### What to look for
 
-Focus only on **genuine upstream improvements**: new scripts, new config files, bug fixes, or structural changes that are not purely name substitutions.
+Focus only on **genuine upstream improvements**: new scripts, new config files, bug fixes, structural changes, or upstream updates to template-owned `.github/instructions/blueprint.*.instructions.md` files.
 
 ### How to handle a template sync PR
 
@@ -673,7 +687,7 @@ When asked to review and clean up a template sync PR:
 
 1. Run `gh pr diff <number>` and read through all changes
 2. Identify the **genuine changes** to keep (new files, real fixes, structural improvements)
-3. Identify the **noise** to revert (all name/domain substitutions and devcontainer personal config changes listed above)
+3. Identify the **noise** to revert (name/domain substitutions outside the template-owned instruction files, devcontainer personal config changes, and bootstrap workaround regressions listed above)
 4. Pull the branch, revert the noise, push to update the PR:
 
 ```bash
