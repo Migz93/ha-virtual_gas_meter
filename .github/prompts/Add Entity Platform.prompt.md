@@ -19,7 +19,7 @@ If not provided, ask for:
 
 ### 1. Create Platform Directory Structure
 
-**Directory:** `custom_components/virtual_gas_meter/[platform]/`
+**Directory:** `custom_components/{domain}/[platform]/`
 
 **Files to create:**
 
@@ -29,7 +29,7 @@ If not provided, ask for:
 ### 2. Platform `__init__.py` Template
 
 ```python
-"""[Platform] platform for Virtual Gas Meter."""
+"""[Platform] platform for [Integration Title]."""
 
 from __future__ import annotations
 
@@ -38,10 +38,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .entity import VirtualGasMeterEntity
-from .[entity_file] import VirtualGasMeter[EntityName]
+from .entity import {ClassPrefix}Entity
+from .[entity_file] import {ClassPrefix}[EntityName]
 from .const import DOMAIN
-from .coordinator import VirtualGasMeterDataUpdateCoordinator
+from .coordinator import {ClassPrefix}DataUpdateCoordinator
 
 
 async def async_setup_entry(
@@ -50,13 +50,13 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up [platform] platform."""
-    coordinator: VirtualGasMeterDataUpdateCoordinator = hass.data[DOMAIN][
+    coordinator: {ClassPrefix}DataUpdateCoordinator = hass.data[DOMAIN][
         entry.entry_id
     ]
 
     async_add_entities(
         [
-            VirtualGasMeter[EntityName](coordinator, entry),
+            {ClassPrefix}[EntityName](coordinator, entry),
             # Add more entities here
         ]
     )
@@ -65,7 +65,7 @@ async def async_setup_entry(
 ### 3. Entity Implementation Template
 
 ```python
-"""[Entity description] for Virtual Gas Meter."""
+"""[Entity description] for [Integration Title]."""
 
 from __future__ import annotations
 
@@ -78,12 +78,12 @@ from homeassistant.components.[platform] import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import callback
 
-from .coordinator import VirtualGasMeterDataUpdateCoordinator
-from .entity import VirtualGasMeterEntity
+from .coordinator import {ClassPrefix}DataUpdateCoordinator
+from .entity import {ClassPrefix}Entity
 
 
-class VirtualGasMeter[EntityName](
-    VirtualGasMeterEntity,
+class {ClassPrefix}[EntityName](
+    {ClassPrefix}Entity,
     [PlatformEntityClass],
 ):
     """Representation of [entity description]."""
@@ -100,7 +100,7 @@ class VirtualGasMeter[EntityName](
 
     def __init__(
         self,
-        coordinator: VirtualGasMeterDataUpdateCoordinator,
+        coordinator: {ClassPrefix}DataUpdateCoordinator,
         entry: ConfigEntry,
     ) -> None:
         """Initialize the [entity]."""
@@ -129,7 +129,7 @@ class VirtualGasMeter[EntityName](
 
 ### 4. Update Manifest
 
-Add platform to `custom_components/virtual_gas_meter/manifest.json`:
+Add platform to `custom_components/{domain}/manifest.json`:
 
 ```json
 {
@@ -236,15 +236,15 @@ script/develop         # Start Home Assistant for testing
 ```python
 from homeassistant.helpers.device_registry import DeviceInfo
 
-class VirtualGasMeter[EntityName](
-    VirtualGasMeterEntity,
+class {ClassPrefix}[EntityName](
+    {ClassPrefix}Entity,
     [PlatformEntityClass],
 ):
     """Entity with device grouping."""
 
     def __init__(
         self,
-        coordinator: VirtualGasMeterDataUpdateCoordinator,
+        coordinator: {ClassPrefix}DataUpdateCoordinator,
         entry: ConfigEntry,
     ) -> None:
         """Initialize entity."""
@@ -291,7 +291,7 @@ async def async_press(self) -> None:
 ## Validation Checklist
 
 - [ ] Platform directory created with `__init__.py`
-- [ ] Entity class inherits from both `VirtualGasMeterEntity` and platform class
+- [ ] Entity class inherits from both `{ClassPrefix}Entity` and platform class
 - [ ] `_attr_has_entity_name = True` set (MANDATORY for new integrations)
 - [ ] Entity uses `translation_key` instead of hardcoded `name`
 - [ ] Unique ID set correctly
@@ -307,10 +307,10 @@ async def async_press(self) -> None:
 
 ## Integration Context
 
-- **Domain:** `virtual_gas_meter`
-- **Class prefix:** `VirtualGasMeter`
-- **Base entity:** `VirtualGasMeterEntity` in `entity/base.py`
-- **Coordinator:** `VirtualGasMeterDataUpdateCoordinator`
+- **Domain:** `{domain}`
+- **Class prefix:** `{ClassPrefix}`
+- **Base entity:** `{ClassPrefix}Entity` in `entity/base.py`
+- **Coordinator:** `{ClassPrefix}DataUpdateCoordinator`
 
 Follow patterns from existing platforms in the integration for consistency.
 
