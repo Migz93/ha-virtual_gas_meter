@@ -15,7 +15,6 @@ ENTITY_DESCRIPTIONS = (
     SensorEntityDescription(
         key=SENSOR_HEATING_INTERVAL,
         translation_key="heating_interval",
-        name="Virtual Gas Meter Heating Interval",
     ),
 )
 

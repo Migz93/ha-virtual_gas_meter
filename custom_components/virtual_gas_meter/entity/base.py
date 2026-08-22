@@ -17,7 +17,7 @@ class VirtualGasMeterEntity(CoordinatorEntity["VirtualGasMeterDataUpdateCoordina
     """Base entity for Virtual Gas Meter entities."""
 
     _attr_attribution = ATTRIBUTION
-    _attr_has_entity_name = False
+    _attr_has_entity_name = True
 
     def __init__(
         self,

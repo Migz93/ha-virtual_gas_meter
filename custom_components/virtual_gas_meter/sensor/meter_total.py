@@ -21,7 +21,6 @@ ENTITY_DESCRIPTIONS = (
     SensorEntityDescription(
         key=SENSOR_VIRTUAL_GAS_METER_TOTAL,
         translation_key="meter_total",
-        name="Virtual Gas Meter Total",
         device_class=SensorDeviceClass.GAS,
         state_class=SensorStateClass.TOTAL_INCREASING,
         suggested_display_precision=DECIMAL_PLACES,

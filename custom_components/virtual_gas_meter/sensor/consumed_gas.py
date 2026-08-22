@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     SensorEntityDescription(
         key=SENSOR_CONSUMED_GAS,
-        name="Virtual Gas Meter Consumed Gas",
+        translation_key="consumed_gas",
         device_class=SensorDeviceClass.GAS,
         state_class=SensorStateClass.TOTAL,
         suggested_display_precision=DECIMAL_PLACES,
