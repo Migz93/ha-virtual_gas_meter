@@ -1,0 +1,9 @@
+{
+  "entity": {
+    "sensor": {
+      "heating_interval": {
+        "default": "mdi:clock-outline"
+      }
+    }
+  }
+}

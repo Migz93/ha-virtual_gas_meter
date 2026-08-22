@@ -5,19 +5,23 @@ on:
     branches:
       - main
 
-# Required permissions for GITHUB_TOKEN to create releases and pull requests.
-#
-# Additionally, "Allow GitHub Actions to create and approve pull requests" must
-# be enabled in your repository under Settings > Actions > General.
-# See: https://github.com/googleapis/release-please-action?tab=readme-ov-file#workflow-permissions
-permissions:
-  contents: write
-  pull-requests: write
+# No workflow-level access; the job below grants only what release-please needs.
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
+    # Additionally, "Allow GitHub Actions to create and approve pull requests" must
+    # be enabled in your repository under Settings > Actions > General.
+    # See: https://github.com/googleapis/release-please-action?tab=readme-ov-file#workflow-permissions
+    permissions:
+      contents: write # Needed to create the release commit and tag.
+      pull-requests: write # Needed to open/update the release PR.
     steps:
       - name: Run release-please
         uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1

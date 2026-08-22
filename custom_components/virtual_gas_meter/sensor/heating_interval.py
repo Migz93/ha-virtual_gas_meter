@@ -14,8 +14,7 @@ if TYPE_CHECKING:
 ENTITY_DESCRIPTIONS = (
     SensorEntityDescription(
         key=SENSOR_HEATING_INTERVAL,
-        name="Virtual Gas Meter Heating Interval",
-        icon="mdi:clock-outline",
+        translation_key="heating_interval",
     ),
 )
 

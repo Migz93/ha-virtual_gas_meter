@@ -75,7 +75,7 @@
   "entity": {
     "sensor": {
       "meter_total": {
-        "name": "Virtual Gas Meter Total",
+        "name": "Total",
         "state_attributes": {
           "last_real_meter_reading": {
             "name": "Last Real Meter Reading"
@@ -93,6 +93,12 @@
             "name": "Unit"
           }
         }
+      },
+      "consumed_gas": {
+        "name": "Consumed Gas"
+      },
+      "heating_interval": {
+        "name": "Heating Interval"
       }
     }
   }

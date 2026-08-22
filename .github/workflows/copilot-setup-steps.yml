@@ -19,7 +19,12 @@ on:
       - .github/workflows/copilot-setup-steps.yml
 
 permissions:
+  # Only needs to read the repository to set up the environment.
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 # IMPORTANT: Keep HA_VERSION synchronized across all workflow files:
 # - copilot-setup-steps.yml
@@ -27,12 +32,17 @@ permissions:
 # - validate.yml (if added in the future)
 
 jobs:
+  # Job id must stay exactly "copilot-setup-steps" — GitHub Copilot's coding
+  # agent looks it up by this id, not by the display name below.
   copilot-setup-steps:
+    name: "Copilot Setup Steps"
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0

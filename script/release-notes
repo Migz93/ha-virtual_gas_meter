@@ -28,7 +28,7 @@ cd "$SCRIPT_DIR/.."
 source "$SCRIPT_DIR/.lib/output.sh"
 
 MODE="${1:-stdout}"
-SCRATCH_DIR=".ai-scratch"
+SCRATCH_DIR=".agents/scratch"
 
 # Configuration
 COPILOT_MODEL="${COPILOT_MODEL:-claude-sonnet-4.6}"
@@ -262,7 +262,7 @@ Write: "You can now...", "Your automations will...", "The setup wizard now..."
   ✅ "Fixed: Sensor data could show incorrect values when switching to/from daylight saving time"
 
 **Rule 4 — New features: lead with what the user can DO.**
-  ❌ "Add VirtualGasMeterFanSpeedSensor with EntityDescription"
+  ❌ "Add {ClassPrefix}FanSpeedSensor with EntityDescription"
   ✅ "New sensor shows your device's current fan speed on your dashboard"
 
 **Rule 5 — Refactoring without user impact: omit completely.**
