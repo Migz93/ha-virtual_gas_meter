@@ -1,12 +1,6 @@
 {
-  "name": "HA virtual_gas_meter Dev Container",
+  "name": "HA ${localWorkspaceFolderBasename} Dev Container",
   "image": "mcr.microsoft.com/devcontainers/base:debian",
-  "runArgs": [
-    "--name",
-    "zdev-virtual_gas_meter"
-  ],
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/virtual_gas_meter,type=bind,consistency=cached",
-  "workspaceFolder": "/workspaces/virtual_gas_meter",
   // Lifecycle hooks — execution order on first creation:
   //   onCreateCommand → updateContentCommand → postCreateCommand → postStartCommand → postAttachCommand
   // On subsequent starts (container stopped/restarted):
