@@ -9,8 +9,8 @@ reference: <https://contributors.home-assistant.io/core/integrations/triggers-an
 source and one current implementation instead of trusting this page or an older integration:
 
 ```bash
-rg -n "class Trigger\b|def async_attach_runner|def async_validate_config" .venv/lib/python*/site-packages/homeassistant/helpers/trigger/
-rg -n "class Condition\b|def _async_check|def _async_setup|def _async_unload" .venv/lib/python*/site-packages/homeassistant/helpers/condition*
+rg -n "class Trigger\b|def async_attach_runner|def async_validate_config" .venv/lib/python*/site-packages/homeassistant/helpers/trigger.py
+rg -n "class Condition\b|def _async_check|def _async_setup|def _async_unload" .venv/lib/python*/site-packages/homeassistant/helpers/condition.py
 ```
 
 `device_trigger.py`, `device_condition.py` and `device_action.py` are the frozen predecessor — never add them.
@@ -33,10 +33,15 @@ conditions:
 
 ## Trigger
 
+**Baseline: Home Assistant 2026.8.0.** Implement the abstract `async_attach_runner` method with
+`TriggerActionRunner`. The base class's `async_attach_action` calls this implementation; it is not its replacement.
+This dispatcher example selects devices through `options.device_id` and rejects a nonempty `target`, so it never
+accepts a target that its listener ignores. A target-aware trigger must resolve and apply that target itself.
+
 ```python
 import voluptuous as vol
 
-from homeassistant.const import ATTR_DEVICE_ID, CONF_OPTIONS
+from homeassistant.const import ATTR_DEVICE_ID, CONF_OPTIONS, CONF_TARGET
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
@@ -50,6 +55,7 @@ from homeassistant.helpers.typing import ConfigType
 
 _SCHEMA = vol.Schema(
     {
+        vol.Optional(CONF_TARGET): vol.All(cv.TARGET_FIELDS, vol.Length(max=0)),
         vol.Required(CONF_OPTIONS): {
             vol.Required(ATTR_DEVICE_ID): vol.All(cv.ensure_list, [cv.string]),
         },
@@ -62,7 +68,7 @@ class {ClassPrefix}FaultReportedTrigger(Trigger):
 
     @classmethod
     async def async_validate_config(cls, hass: HomeAssistant, config: ConfigType) -> ConfigType:
-        """Validate the options and target of the trigger."""
+        """Validate device options and reject a nonempty target."""
         return _SCHEMA(config)
 
     def __init__(self, hass: HomeAssistant, config: TriggerConfig) -> None:

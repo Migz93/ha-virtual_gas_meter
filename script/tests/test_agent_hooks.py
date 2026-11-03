@@ -1,5 +1,7 @@
 """Regression tests for synchronized agent lifecycle hooks."""
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
 import subprocess
@@ -7,6 +9,8 @@ import subprocess
 import pytest
 
 HOOK = Path(__file__).parents[2] / ".agents" / "hooks" / "pre-push-check.sh"
+BOOTSTRAP = HOOK.parents[2] / "script/setup/bootstrap"
+NATIVE_HOOK = BOOTSTRAP.read_text(encoding="utf-8").split("<<'PUSH_HOOK'\n", 1)[1].split("\nPUSH_HOOK", 1)[0] + "\n"
 CONFIG = "default_install_hook_types: [pre-commit, commit-msg, pre-push]\n"
 BYPASS = "BLOCK skipping git hooks would skip script/push-gate; push without --no-verify or core.hooksPath"
 
@@ -18,10 +22,13 @@ def _initialize_repository(path: Path, *, config: str | None = CONFIG, hook_inst
     if config is not None:
         (path / ".pre-commit-config.yaml").write_text(config, encoding="utf-8")
     if hook_installed:
-        (path / ".git" / "hooks" / "pre-push").write_text(
-            '#!/bin/sh\nexec "$PWD/script/pre-push" "$@"\n', encoding="utf-8"
-        )
+        (path / ".git" / "hooks" / "pre-push").write_text(NATIVE_HOOK, encoding="utf-8")
         (path / ".git" / "hooks" / "pre-push").chmod(0o755)
+        (path / "script").mkdir()
+        for name in ("pre-push", "push-gate"):
+            script = path / "script" / name
+            script.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+            script.chmod(0o755)
 
 
 @pytest.fixture
@@ -93,6 +100,10 @@ def test_allows_a_push_the_git_hook_checks(repository: Path, command: str) -> No
     [
         "git push --no-verify",
         "env -u HOME git push --no-verify",
+        "command -p git push --no-verify",
+        "time -p git push --no-verify",
+        "exec -c git push --no-verify",
+        "exec -a alias git push --no-verify",
         "sudo -u dev git push --no-verify",
         "timeout 60 git push --no-verify",
         "/usr/bin/env git push --no-verify",
@@ -247,3 +258,91 @@ def test_rejects_non_object_payload(tmp_path: Path) -> None:
     result = subprocess.run(["bash", str(HOOK)], cwd=tmp_path, input="[]", capture_output=True, text=True, check=False)
     assert result.returncode == 2
     assert "cannot inspect" in result.stderr
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("option", ["-C", "--chdir", "--chdir=", "-Cinline"])
+def test_env_directory_changes_select_the_pushing_repository(tmp_path: Path, option: str) -> None:
+    """Env's cwd change must not borrow a valid hook from the caller's repository."""
+    caller, other = tmp_path / "caller", tmp_path / "other"
+    _initialize_repository(caller)
+    _initialize_repository(other, hook_installed=False)
+    flag = (
+        "-C../other" if option == "-Cinline" else ("--chdir=../other" if option.endswith("=") else option + " ../other")
+    )
+    assert _explain(f"env {flag} git push", caller).startswith("BLOCK git's pre-push hook is not installed")
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("option", ["-S", "--split-string", "--split-string="])
+def test_unresolved_env_split_strings_are_blocked(repository: Path, option: str) -> None:
+    """Split-string parsing must never hide --no-verify from inspection."""
+    separator = "" if option.endswith("=") else " "
+    assert _explain(f"env {option}{separator}'git push --no-verify'", repository).startswith("BLOCK env split strings")
+
+
+@pytest.mark.unit
+def test_a_comment_mentioning_the_gate_does_not_install_it(repository: Path) -> None:
+    """A no-op hook cannot satisfy the bootstrap contract by merely mentioning a filename."""
+    (repository / ".git/hooks/pre-push").write_text("#!/bin/sh\n# script/pre-push\nexit 0\n", encoding="utf-8")
+    assert _explain("git push", repository).startswith("BLOCK git's pre-push hook does not install the native gate")
+
+
+@pytest.mark.unit
+def test_missing_gate_target_is_blocked(repository: Path) -> None:
+    """A matching wrapper still needs its executable validation target."""
+    (repository / "script/push-gate").unlink()
+    assert _explain("git push", repository).startswith("BLOCK the native push gate is incomplete")
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("absolute", [False, True])
+def test_git_resolves_the_effective_custom_hooks_path(repository: Path, absolute: bool) -> None:
+    """Git's --git-path already honours both relative and absolute core.hooksPath values."""
+    directory = repository / "custom-hooks"
+    directory.mkdir()
+    (repository / ".git/hooks/pre-push").rename(directory / "pre-push")
+    subprocess.run(
+        ["git", "config", "core.hooksPath", str(directory) if absolute else "custom-hooks"], cwd=repository, check=True
+    )
+    assert _explain("git push", repository) == "ALLOW"
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("body", ["cd ../checked", "(cd ../checked)", "true; cd ../checked"])
+def test_subshell_cwd_does_not_escape_its_scope(tmp_path: Path, body: str) -> None:
+    """A successful cd inside parentheses must not lend its hook to the following push."""
+    caller, checked = tmp_path / "caller", tmp_path / "checked"
+    _initialize_repository(caller, hook_installed=False)
+    _initialize_repository(checked)
+    assert _explain(f"({body}); git push", caller).startswith("BLOCK git's pre-push hook is not installed")
+    assert _explain("(cd ../caller); git push", checked) == "ALLOW"
+    assert _explain("(cd ../caller; git push)", checked).startswith("BLOCK git's pre-push hook is not installed")
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "command",
+    [
+        "GIT_DIR=../other/.git git push",
+        "env GIT_DIR=../other/.git git push",
+        "env GIT_WORK_TREE=../other git push",
+        "env GIT_COMMON_DIR=../other/.git bash -c 'git push'",
+        "git --git-dir=../other/.git push",
+        "git --git-dir ../other/.git push",
+        "git --work-tree=../other push",
+        "GIT_DIR=../other/.git; git push",
+        "export GIT_DIR=../other/.git; git push",
+        "env GIT_CONFIG_GLOBAL=../other/config git push",
+    ],
+)
+def test_repository_overrides_cannot_borrow_the_callers_hook(repository: Path, command: str) -> None:
+    """Unresolved repository/configuration overrides must not validate the caller instead."""
+    assert _explain(command, repository).startswith("BLOCK repository overrides cannot be validated")
+
+
+@pytest.mark.unit
+def test_repository_override_is_local_to_its_subshell(repository: Path) -> None:
+    """A subshell assignment does not affect a subsequent push in the parent shell."""
+    assert _explain("(export GIT_DIR=/unused); git push", repository) == "ALLOW"
+    assert _explain("git --git-dir=/unused status", repository) == "ALLOW"

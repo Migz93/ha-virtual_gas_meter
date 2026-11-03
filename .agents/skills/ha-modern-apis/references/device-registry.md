@@ -33,13 +33,30 @@ These rules hold in migrations, repairs, diagnostics, registry listeners **and t
 | A device by identifier                                   | `device_registry.async_get_device_by_identifier((DOMAIN, serial), entry.entry_id)`                                                          |
 | A device by connection                                   | `device_registry.async_get_device_by_connection((dr.CONNECTION_NETWORK_MAC, mac), entry.entry_id)`                                          |
 | Only the device **id**, to pass as `via_device_id`       | `dr.async_get_device_id_by_identifier(hass, (DOMAIN, hub_id), config_entry_id=entry.entry_id)` — raises `ValueError` when it does not exist |
-| A device from a `device_id` in an action, with its entry | `dr.async_get_device_and_config_entry_for_domain(hass, device_id, domain=DOMAIN)` — `(None, None)` unknown, `(device, None)` not ours       |
+| A device from a `device_id` in an action, with its entry | Use the baseline lookup below: reject legacy composite IDs before validating the owning entry                                               |
 | All devices of the entry                                 | `dr.async_entries_for_config_entry(device_registry, entry.entry_id)`                                                                        |
-| A child device / all children of a device                | `async_get_child_device_by_identifier(identifier, entry.entry_id)` / `dr.async_entries_for_parent_device(device_registry, parent_id)`       |
 | Every device with an identifier, across entries          | `device_registry.async_get_devices(identifiers=…)` — rarely right in an integration                                                         |
 
-`device_registry.async_get(device_id)` returns main **and** child devices, and by default also a read-only stand-in for
-the id of a pre-2026.8 composite device; `include_child_devices=False` / `include_composite_devices=False` narrow it.
+On 2026.8.0, `device_registry.async_get(device_id)` accepts only the device ID. An old composite ID returns a
+stand-in whose config entry belongs to the former primary owner, which may be another domain. This baseline
+example explicitly rejects those IDs rather than selecting the wrong owning entry:
+
+```python
+from homeassistant.exceptions import ServiceValidationError
+from homeassistant.helpers import service
+
+if device_registry.async_is_composite_device_id(device_id) is not False:
+    raise ServiceValidationError("Select a current device ID, not an unknown or legacy composite ID")
+device = device_registry.async_get(device_id)
+if device is None:
+    raise ServiceValidationError("Device not found")
+entry = service.async_get_config_entry(hass, DOMAIN, device.config_entry_id)
+```
+
+If supporting legacy IDs is required, resolve `async_get_devices_for_composite_device_id(device_id)` and select
+an unambiguous split owned by `DOMAIN` before validating its entry. Do not use the stand-in's primary entry.
+Do not pass `include_child_devices` or `include_composite_devices` flags on 2026.8.0; those flags and the
+child-device lookup methods describe newer APIs.
 
 ## Hub or parts: `via_device_id` versus child devices
 
