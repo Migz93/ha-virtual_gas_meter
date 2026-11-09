@@ -172,7 +172,8 @@ and report what you could not verify rather than assuming it:
 The development container keeps its image-provided Python and command-line tools. Run project setup and checks
 inside that container, as described in `AGENTS.md`; setup does not install mise or tools on the host.
 
-`mise.toml` provides the upstream tool pins used by CI. `script/setup/toolchain` is an optional, explicit way to
+`mise.toml` provides optional upstream tool pins; this repository's retained CI workflows do not use mise.
+`script/setup/toolchain` is an optional, explicit way to
 install those pins inside a development environment. Project additions belong in `.config/mise/conf.d/project.toml`,
 which template sync leaves alone. Personal mise overrides belong in the ignored `mise.local.toml`.
 `script/ha-version-sync` checks the Python pin against the supported Home Assistant release.
@@ -184,7 +185,8 @@ dependency on the release train declared in `hacs.json`; a new train is a separa
 `.github/renovate.json` is optional configuration. It needs the Renovate GitHub App and an owner decision to adopt it.
 Before enabling it, coordinate its coverage with Dependabot to avoid duplicate updates. Scanner updates retain
 manual merge approval. `mise run renovate-dry-run` can show proposed updates without opening pull requests.
-The optional `toolchain-update-check.yml` workflow reports outdated pins when Renovate is inactive.
+The upstream optional `toolchain-update-check.yml` workflow can report outdated pins when installed. This sync
+retains the existing workflows, so that workflow is not available here; check tool versions manually.
 
 ## Extending the scripts with hooks
 
