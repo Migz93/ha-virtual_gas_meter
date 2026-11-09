@@ -135,3 +135,6 @@ requirements_test.txt
 script/tests/test_initialize.py
 .agents/skills/blueprint-skill-maintenance/
 docs/blueprint/
+
+# Project-owned mise tools must survive future blueprint syncs.
+.config/mise/conf.d/project.toml

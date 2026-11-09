@@ -252,3 +252,7 @@ $RECYCLE.BIN/
 # Private host instructions and local agent permissions
 LOCAL.md
 .claude/settings.local.json
+
+.agents/scratch/
+
+mise.local.toml
