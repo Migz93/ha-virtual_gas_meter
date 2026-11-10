@@ -34,8 +34,10 @@ pyproject.toml
 
 # ── Runtime dependencies ──────────────────────────────────────
 # requirements.txt lists your integration's PyPI dependencies (synced with
-# manifest.json → requirements). This is user-owned content; requirements_dev.txt
-# and requirements_test.txt are blueprint-managed tooling and do get synced.
+# manifest.json → requirements). This is user-owned content. requirements_dev.txt
+# remains blueprint-managed tooling; requirements_test.txt is repository-owned
+# because its Home Assistant test baseline must match the supported minimum, and
+# is excluded in the supported-version policy section below.
 requirements.txt
 
 # ── VS Code workspace settings ───────────────────────────────
@@ -115,3 +117,24 @@ uv.lock
 
 # Repository-owned CodeRabbit review scope
 .coderabbit.yaml
+
+# Repository-owned development, review and supported-version policy
+CODEX.md
+.devcontainer/.env.local.example
+.devcontainer/devcontainer.json
+.devcontainer/devcontainer-lock.json
+.agents/hooks/pre-push-check.sh
+script/tests/test_agent_hooks.py
+.agents/hooks/session-start.sh
+script/tests/test_session_start.py
+script/push-gate
+script/tests/test_push_gate.py
+script/prune-blueprint
+script/tests/test_prune_blueprint.py
+requirements_test.txt
+script/tests/test_initialize.py
+.agents/skills/blueprint-skill-maintenance/
+docs/blueprint/
+
+# Project-owned mise tools must survive future blueprint syncs.
+.config/mise/conf.d/project.toml
