@@ -70,6 +70,7 @@ GEMINI.md
 # Ownership, funding, and other per-project settings
 .github/CODEOWNERS
 .github/FUNDING.yml
+.github/release-notes/
 .github/COPILOT_CODING_AGENT.md
 
 # ── Script and DevContainer hooks ────────────────────────────
@@ -123,6 +124,8 @@ CODEX.md
 .devcontainer/.env.local.example
 .devcontainer/devcontainer.json
 .devcontainer/devcontainer-lock.json
+.devcontainer/on-create.sh
+.devcontainer/post-start.sh
 .agents/hooks/pre-push-check.sh
 script/tests/test_agent_hooks.py
 .agents/hooks/session-start.sh
@@ -130,6 +133,8 @@ script/tests/test_session_start.py
 script/push-gate
 script/tests/test_push_gate.py
 script/prune-blueprint
+script/import-overlay
+script/tests/test_import_overlay.py
 script/tests/test_prune_blueprint.py
 requirements_test.txt
 script/tests/test_initialize.py

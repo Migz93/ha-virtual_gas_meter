@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import voluptuous as vol
+import probatio
 
 from custom_components.virtual_gas_meter.const import (
     ATTR_METER_READING,
@@ -37,11 +37,11 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         DOMAIN,
         SERVICE_REAL_METER_READING_UPDATE,
         handle_real_meter_reading_update,
-        schema=vol.Schema(
+        schema=probatio.Schema(
             {
-                vol.Required(ATTR_METER_READING): cv.positive_float,
-                vol.Optional(ATTR_TIMESTAMP): cv.datetime,
-                vol.Optional(ATTR_RECALCULATE_AVERAGE_RATE, default=True): cv.boolean,
+                probatio.Required(ATTR_METER_READING): cv.positive_float,
+                probatio.Optional(ATTR_TIMESTAMP): cv.datetime,
+                probatio.Optional(ATTR_RECALCULATE_AVERAGE_RATE, default=True): cv.boolean,
             },
         ),
     )
