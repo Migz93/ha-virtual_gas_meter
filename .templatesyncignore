@@ -55,6 +55,8 @@ initialize.sh
 hacs.json
 CONTRIBUTING.md
 DEPENDENCIES.md
+docs/development/DECISIONS.md
+docs/development/decisions/
 
 # ── AI agent instruction files ───────────────────────────────
 # Project-identity files are customized during initialization and must not be
