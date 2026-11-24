@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from logging import Logger
 from typing import Any
 
-import voluptuous as vol
+import probatio
 
 from custom_components.virtual_gas_meter.const import (
     ATTR_METER_READING,
@@ -274,17 +274,17 @@ class VirtualGasMeterDataUpdateCoordinator(DataUpdateCoordinator[VirtualGasMeter
         if not data:
             return
 
-        self._state.last_real_meter_reading = vol.Coerce(float)(
+        self._state.last_real_meter_reading = probatio.Coerce(float)(
             data.get("last_real_meter_reading", self._state.last_real_meter_reading),
         )
         self._state.last_real_meter_timestamp = datetime.fromisoformat(
             data.get("last_real_meter_timestamp", self._state.last_real_meter_timestamp.isoformat()),
         )
-        self._state.average_rate_per_h = vol.Coerce(float)(
+        self._state.average_rate_per_h = probatio.Coerce(float)(
             data.get("average_rate_per_h", self._state.average_rate_per_h),
         )
-        self._state.consumed_gas = vol.Coerce(float)(data.get("consumed_gas", 0.0))
-        self._state.heating_interval_minutes = vol.Coerce(int)(data.get("heating_interval_minutes", 0))
+        self._state.consumed_gas = probatio.Coerce(float)(data.get("consumed_gas", 0.0))
+        self._state.heating_interval_minutes = probatio.Coerce(int)(data.get("heating_interval_minutes", 0))
 
         self.logger.debug(
             "Loaded persisted data: last_reading=%.3f, consumed=%.3f, interval=%dm, rate=%.3f",

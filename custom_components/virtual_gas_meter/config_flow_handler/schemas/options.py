@@ -2,20 +2,20 @@
 
 from __future__ import annotations
 
-import voluptuous as vol
+import probatio
 
 from custom_components.virtual_gas_meter.const import ALLOWED_BOILER_DOMAINS, CONF_AVERAGE_RATE, CONF_BOILER_ENTITY
 from homeassistant.helpers import config_validation as cv, selector
 
 
-def get_options_schema(boiler_entity: str, average_rate: float) -> vol.Schema:
+def get_options_schema(boiler_entity: str, average_rate: float) -> probatio.Schema:
     """Return the options schema."""
-    return vol.Schema(
+    return probatio.Schema(
         {
-            vol.Required(CONF_BOILER_ENTITY, default=boiler_entity): selector.EntitySelector(
+            probatio.Required(CONF_BOILER_ENTITY, default=boiler_entity): selector.EntitySelector(
                 selector.EntitySelectorConfig(domain=ALLOWED_BOILER_DOMAINS),
             ),
-            vol.Required(CONF_AVERAGE_RATE, default=average_rate): cv.positive_float,
+            probatio.Required(CONF_AVERAGE_RATE, default=average_rate): cv.positive_float,
         },
     )
 

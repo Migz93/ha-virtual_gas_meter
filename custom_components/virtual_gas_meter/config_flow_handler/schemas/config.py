@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-import voluptuous as vol
+import probatio
 
 from custom_components.virtual_gas_meter.const import (
     ALLOWED_BOILER_DOMAINS,
@@ -19,18 +19,18 @@ from custom_components.virtual_gas_meter.const import (
 from homeassistant.helpers import config_validation as cv, selector
 
 
-def get_user_schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:
+def get_user_schema(defaults: Mapping[str, Any] | None = None) -> probatio.Schema:
     """Return the user setup schema."""
     defaults = defaults or {}
 
-    return vol.Schema(
+    return probatio.Schema(
         {
-            vol.Required(CONF_BOILER_ENTITY, default=defaults.get(CONF_BOILER_ENTITY, vol.UNDEFINED)): (
+            probatio.Required(CONF_BOILER_ENTITY, default=defaults.get(CONF_BOILER_ENTITY, probatio.UNDEFINED)): (
                 selector.EntitySelector(
                     selector.EntitySelectorConfig(domain=ALLOWED_BOILER_DOMAINS),
                 )
             ),
-            vol.Required(CONF_UNIT, default=defaults.get(CONF_UNIT, UNIT_M3)): selector.SelectSelector(
+            probatio.Required(CONF_UNIT, default=defaults.get(CONF_UNIT, UNIT_M3)): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=[
                         selector.SelectOptionDict(value=UNIT_M3, label="Cubic Meters (m3)"),
@@ -39,11 +39,11 @@ def get_user_schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:
                     mode=selector.SelectSelectorMode.DROPDOWN,
                 ),
             ),
-            vol.Required(
+            probatio.Required(
                 CONF_INITIAL_METER_READING,
                 default=defaults.get(CONF_INITIAL_METER_READING, 0.0),
             ): cv.positive_float,
-            vol.Required(
+            probatio.Required(
                 CONF_INITIAL_AVERAGE_RATE,
                 default=defaults.get(CONF_INITIAL_AVERAGE_RATE, 0.0),
             ): cv.positive_float,
